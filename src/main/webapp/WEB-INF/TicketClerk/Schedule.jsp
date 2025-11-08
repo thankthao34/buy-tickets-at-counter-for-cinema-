@@ -326,54 +326,111 @@
         }
 
         /* --- Lịch chiếu (Showtimes) --- */
-        /* Style này đã có từ SearchMovie.jsp, chỉ cần đảm bảo nó ở đây */
+        /* Improved, cleaner styles for the schedule page */
         .showtimes-grid{
             display:flex;
             flex-wrap:wrap;
-            gap:8px; /* tighter */
+            gap:12px;
             align-items:center;
-            margin-top:12px;
+            margin-top:14px;
         }
-        .showtime-box{
-            width:80px;
-            min-height: 48px; /* compact */
-            padding: 6px 8px;
-            border-radius: 10px; /* slightly smaller radius */
-            border: 1px solid rgba(255,255,255,0.04);
-            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-            cursor:pointer;
-            box-shadow: 0 6px 12px rgba(2,6,23,0.12);
+
+        /* Date tabs (today / tomorrow / +2) */
+        .date-tab {
             display:flex;
             flex-direction:column;
             align-items:center;
             justify-content:center;
+            width:76px;
+            padding:10px 8px;
+            border-radius:12px;
+            background: transparent;
+            color: rgba(255,255,255,0.85);
+            border: 1px solid rgba(255,255,255,0.04);
             transition: all var(--transition-duration) ease;
         }
+        .date-tab:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 22px rgba(2,6,23,0.25);
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        }
+        .date-tab .day-number { font-size:1.6rem; font-weight:800; line-height:1; color:inherit; }
+        .date-tab .day-label { font-size:0.82rem; color:rgba(255,255,255,0.78); }
+        .date-tab.active {
+            background: linear-gradient(180deg, rgba(47,60,126,0.95), rgba(47,60,126,0.85));
+            color: #fff;
+            border-color: rgba(47,60,126,0.9);
+            box-shadow: 0 14px 36px rgba(47,60,126,0.28);
+            transform: none;
+        }
+
+        /* Showtimes */
+        .showtime-box{
+            min-width:96px;
+            padding:10px 12px;
+            border-radius:12px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            cursor:pointer;
+            box-shadow: 0 8px 18px rgba(2,6,23,0.14);
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        }
         .showtime-box .time{
-            font-weight:700;
-            color: #ffffff; /* white time */
-            font-size: 0.95rem;
+            font-weight:800;
+            color: #ffffff;
+            font-size: 1.05rem;
         }
         .showtime-box:hover{
-            transform:translateY(-3px);
-            box-shadow: 0 12px 28px rgba(2,6,23,0.2);
-            border-color: rgba(255,255,255,0.12);
+            transform:translateY(-6px) scale(1.02);
+            box-shadow: 0 18px 40px rgba(2,6,23,0.28);
+            border-color: rgba(255,255,255,0.14);
         }
-        /* Disabled / past showtime */
         .showtime-box.disabled {
             opacity: 0.45;
             cursor: default;
-            filter: grayscale(60%);
+            filter: grayscale(50%);
             pointer-events: none;
             transform: none;
             box-shadow: none;
             border-color: rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.02);
         }
-        .showtime-box .price-short { 
-            font-size:11px; 
-            color: rgba(255,255,255,0.9); 
-            margin-top:4px; 
-            font-weight:800; 
+        .showtime-box .price-short {
+            font-size:12px;
+            color: rgba(255,255,255,0.9);
+            margin-top:6px;
+            font-weight:800;
+        }
+
+        /* Make content-card a bit lighter and more elevated */
+        .content-card {
+            width: 100%;
+            max-width: 1100px;
+            background-color: rgba(255,255,255,0.06);
+            border-radius: var(--radius-lg);
+            padding: calc(var(--spacing-lg) + 8px) calc(var(--spacing-lg) + 8px);
+            box-shadow: 0 20px 50px rgba(2,6,23,0.55);
+            margin: calc(var(--spacing-md) / 2) 0;
+            border: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(14px) saturate(120%);
+            -webkit-backdrop-filter: blur(14px) saturate(120%);
+            color: #ffffff;
+        }
+
+        /* Slightly tweak modal to match the new look */
+        .modal-box{
+            background: #0b1220;
+            border-radius: var(--radius-lg);
+            max-width:720px;
+            width:92%;
+            padding: var(--spacing-lg);
+            box-shadow: 0 28px 70px rgba(2,6,23,0.6);
+            position:relative;
+            color: #f8fafc;
         }
 
         /* Modal (Hộp thoại) */
@@ -588,51 +645,93 @@
                         <%= (movie!=null && movie.getDescription()!=null) ? movie.getDescription() : "(Không có mô tả)" %>
                     </p>
                     
-                    <h3 class="showtime-section-title">Suất chiếu hôm nay — <%= todayStr %></h3>
+                    <%-- Tabbed date selector: today / tomorrow / day-after --%>
+                    <%
+                        // selectedDateParam provided by ScheduleServlet in yyyy-MM-dd format
+                        String selectedDateParam = (String) request.getAttribute("selectedDateParam");
+                        String selectedDateDisplay = (String) request.getAttribute("selectedDateDisplay");
+                        java.util.Calendar calTab = java.util.Calendar.getInstance();
+                        java.text.SimpleDateFormat sdfParam = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                        java.text.SimpleDateFormat sdfDisplay = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                        String d0 = sdfParam.format(calTab.getTime());
+                        String d0disp = sdfDisplay.format(calTab.getTime());
+                        calTab.add(java.util.Calendar.DATE, 1);
+                        String d1 = sdfParam.format(calTab.getTime());
+                        String d1disp = sdfDisplay.format(calTab.getTime());
+                        calTab.add(java.util.Calendar.DATE, 1);
+                        String d2 = sdfParam.format(calTab.getTime());
+                        String d2disp = sdfDisplay.format(calTab.getTime());
+                        if (selectedDateParam == null) selectedDateParam = d0; // default to today
+                        if (selectedDateDisplay == null) {
+                            try {
+                                java.util.Date dd = java.sql.Date.valueOf(selectedDateParam);
+                                selectedDateDisplay = sdfDisplay.format(dd);
+                            } catch (Exception ex) {
+                                selectedDateDisplay = d0disp;
+                            }
+                        }
+                        int movieIdForLink = movie != null ? movie.getId() : -1;
+                    %>
 
-                    <% if (todayList.isEmpty()) { %>
-                        <div class="empty-state">Hôm nay chưa có suất chiếu.</div>
+                    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+                        <a class="date-tab <%= selectedDateParam.equals(d0) ? "active" : "" %>" href="<%=request.getContextPath()%>/schedule?movieId=<%=movieIdForLink%>&date=<%=d0%>" style="text-decoration:none;">
+                            <div style="font-size:1.6rem;font-weight:800;line-height:1;"> <%= d0.substring(8) %> </div>
+                            <div style="font-size:0.85rem;color:rgba(255,255,255,0.8);">Hôm nay</div>
+                        </a>
+                        <a class="date-tab <%= selectedDateParam.equals(d1) ? "active" : "" %>" href="<%=request.getContextPath()%>/schedule?movieId=<%=movieIdForLink%>&date=<%=d1%>" style="text-decoration:none;">
+                            <div style="font-size:1.6rem;font-weight:800;line-height:1;"> <%= d1.substring(8) %> </div>
+                            <div style="font-size:0.85rem;color:rgba(255,255,255,0.8);">Ngày mai</div>
+                        </a>
+                        <a class="date-tab <%= selectedDateParam.equals(d2) ? "active" : "" %>" href="<%=request.getContextPath()%>/schedule?movieId=<%=movieIdForLink%>&date=<%=d2%>" style="text-decoration:none;">
+                            <div style="font-size:1.6rem;font-weight:800;line-height:1;"> <%= d2.substring(8) %> </div>
+                            <div style="font-size:0.85rem;color:rgba(255,255,255,0.8);">+2 ngày</div>
+                        </a>
+                        <div style="margin-left:auto;color:rgba(255,255,255,0.9);font-weight:600">Suất chiếu — <%= selectedDateDisplay %></div>
+                    </div>
+
+                    <% if (schedules == null || schedules.isEmpty()) { %>
+                        <div class="empty-state">Không có suất chiếu cho ngày này.</div>
                     <% } else { %>
                         <div class="showtimes-grid">
-                            <% 
-                                // Vòng lặp
-                                for (Schedule s2 : todayList) {
-                                            SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
-                                            String timeOnly = s2.getStartTime() != null ? tf.format(s2.getStartTime()) : "--:--";
-                                            String endOnly = s2.getEndTime() != null ? tf.format(s2.getEndTime()) : "--:--";
-                                            long shortP = Math.round((s2.getBasePrice() / 1000.0));
-                                            String shortPrice = shortP + "K";
-                                            String priceFull = String.format("%,.0f", s2.getBasePrice());
-                                            String idStr = String.valueOf(s2.getId());
-                                            String roomName = (s2.getRoom() != null && s2.getRoom().getName() != null) ? s2.getRoom().getName() : "(không rõ)";
-                                            String roomDesc = (s2.getRoom() != null && s2.getRoom().getDescription() != null) ? s2.getRoom().getDescription() : "";
-                                            String roomEsc = roomName.replace("'","\\'");
-                                            String roomDescEsc = roomDesc.replace("'","\\'");
-                                            // Determine if this showtime is already in the past (for today)
-                                            java.util.Calendar nowCal = java.util.Calendar.getInstance();
-                                            java.util.Calendar sc = java.util.Calendar.getInstance();
-                                            if (s2.getDate() != null) sc.setTime(s2.getDate());
-                                            if (s2.getStartTime() != null) {
-                                                java.util.Calendar st = java.util.Calendar.getInstance();
-                                                st.setTime(s2.getStartTime());
-                                                sc.set(java.util.Calendar.HOUR_OF_DAY, st.get(java.util.Calendar.HOUR_OF_DAY));
-                                                sc.set(java.util.Calendar.MINUTE, st.get(java.util.Calendar.MINUTE));
-                                                sc.set(java.util.Calendar.SECOND, st.get(java.util.Calendar.SECOND));
-                                            }
-                                            boolean isPast = sc.getTime().before(nowCal.getTime());
-                                    %>
-                                            <% if (!isPast) { %>
-                                            <button type="button" class="showtime-box" title="<%= timeOnly %> — <%= priceFull %> VND" aria-label="Suất <%= timeOnly %>, giá <%= priceFull %> VND, phòng <%= roomEsc %>" onclick="openScheduleModal('<%=idStr%>','<%=roomEsc%>','<%= (s2.getDate()!=null?dfOnly.format(s2.getDate()):'-') %>','<%=timeOnly%>','<%=endOnly%>','<%=shortPrice%>','<%=roomDescEsc%>')">
-                                                <div class="time"><%= timeOnly %></div>
-                                                <div class="price-short"><%= shortPrice %></div>
-                                            </button>
-                                            <% } else { %>
-                                            <button type="button" class="showtime-box disabled" title="Suất đã bắt đầu" aria-label="Suất đã bắt đầu" disabled>
-                                                <div class="time"><%= timeOnly %></div>
-                                                <div class="price-short"><%= shortPrice %></div>
-                                            </button>
-                                            <% } %>
-                                    <% } %>
+                            <%
+                                // render schedules passed by servlet (already filtered for selected date)
+                                for (Schedule s2 : schedules) {
+                                    SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
+                                    String timeOnly = s2.getStartTime() != null ? tf.format(s2.getStartTime()) : "--:--";
+                                    String endOnly = s2.getEndTime() != null ? tf.format(s2.getEndTime()) : "--:--";
+                                    long shortP = Math.round((s2.getBasePrice() / 1000.0));
+                                    String shortPrice = shortP + "K";
+                                    String priceFull = String.format("%,.0f", s2.getBasePrice());
+                                    String idStr = String.valueOf(s2.getId());
+                                    String roomName = (s2.getRoom() != null && s2.getRoom().getName() != null) ? s2.getRoom().getName() : "(không rõ)";
+                                    String roomDesc = (s2.getRoom() != null && s2.getRoom().getDescription() != null) ? s2.getRoom().getDescription() : "";
+                                    String roomEsc = roomName.replace("'","\\'");
+                                    String roomDescEsc = roomDesc.replace("'","\\'");
+                                    // Determine if this showtime is already in the past (for today)
+                                    java.util.Calendar nowCal = java.util.Calendar.getInstance();
+                                    java.util.Calendar sc = java.util.Calendar.getInstance();
+                                    if (s2.getDate() != null) sc.setTime(s2.getDate());
+                                    if (s2.getStartTime() != null) {
+                                        java.util.Calendar st = java.util.Calendar.getInstance();
+                                        st.setTime(s2.getStartTime());
+                                        sc.set(java.util.Calendar.HOUR_OF_DAY, st.get(java.util.Calendar.HOUR_OF_DAY));
+                                        sc.set(java.util.Calendar.MINUTE, st.get(java.util.Calendar.MINUTE));
+                                        sc.set(java.util.Calendar.SECOND, st.get(java.util.Calendar.SECOND));
+                                    }
+                                    boolean isPast = sc.getTime().before(nowCal.getTime());
+                            %>
+                                <% if (!isPast) { %>
+                                    <button type="button" class="showtime-box" title="<%= timeOnly %> — <%= priceFull %> VND" aria-label="Suất <%= timeOnly %>, giá <%= priceFull %> VND, phòng <%= roomEsc %>" onclick="openScheduleModal('<%=idStr%>','<%=roomEsc%>','<%= (s2.getDate()!=null?dfOnly.format(s2.getDate()):'-') %>','<%=timeOnly%>','<%=endOnly%>','<%=shortPrice%>','<%=roomDescEsc%>')">
+                                        <div class="time"><%= timeOnly %></div>
+                                        <div class="price-short"><%= shortPrice %></div>
+                                    </button>
+                                <% } else { %>
+                                    <button type="button" class="showtime-box disabled" title="Suất đã bắt đầu" aria-label="Suất đã bắt đầu" disabled>
+                                        <div class="time"><%= timeOnly %></div>
+                                        <div class="price-short"><%= shortPrice %></div>
+                                    </button>
+                                <% } %>
+                            <% } %>
                         </div>
                     <% } %>
                 </div>

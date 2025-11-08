@@ -352,11 +352,6 @@
         .seat.available:hover svg { 
             fill: #374151; 
         }
-        
-        /* Bỏ class .vip riêng cho màu vàng */
-        /* .seat.available.vip svg { fill: var(--color-vip); } */
-        /* .seat.available.vip:hover svg { fill: #b8860b; } */
-        
         .seat.booked svg, .seat:disabled svg {
             fill: var(--color-danger); opacity: 0.9; cursor: not-allowed;
         }

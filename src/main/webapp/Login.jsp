@@ -10,19 +10,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-	<style>
-		:root { --font-primary: 'Inter', 'Poppins', sans-serif; }
-		body, .login-page, .login-card, .login-body, .login-header { font-family: var(--font-primary); }
-
-		/* Ensure login headings and button use the same clean typography */
-		.login-header h1, .login-body .form-title, .btn.login-primary {
-			font-family: var(--font-primary);
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
-		}
-		.login-body .form-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 12px; }
-		.btn.login-primary { font-weight: 700; letter-spacing: 0.2px; font-size: 1rem; }
-	</style>
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/login.css" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>

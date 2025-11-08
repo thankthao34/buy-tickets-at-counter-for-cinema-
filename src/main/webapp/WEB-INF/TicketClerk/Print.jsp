@@ -15,7 +15,7 @@
     if (bill.getTickets() != null && !bill.getTickets().isEmpty()) {
         first = bill.getTickets().get(0);
     }
-        // precompute display values to avoid nested scriptlets in the HTML
+    // precompute display values to avoid nested scriptlets in the HTML
         String movieName = "-";
         String dateStr = "-";
         String startTimeStr = "--:--";
@@ -36,6 +36,9 @@
                 roomName = first.getSeatSchedule().getSchedule().getRoom().getName();
             }
         }
+        // points conversion: 1 point = 1000 VND
+        float points = bill.getPointEx();
+        float pointsVnd = points * 1000f;
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -103,49 +106,19 @@
                 <div class="grid">
                     <div class="chip">
                         <div class="note">Phim</div>
-                        <div><strong>
-                            <% if (bill.getTickets()!=null && !bill.getTickets().isEmpty()) {
-                                    movieName
-                                if (first.getSeatSchedule()!=null && first.getSeatSchedule().getSchedule()!=null && first.getSeatSchedule().getSchedule().getMovie()!=null) {
-                                    movieName = first.getSeatSchedule().getSchedule().getMovie().getName();
-                                }
-                            %>
-                            <%= movieName %>
-                            <% } else { %>
-                                -
-                            <% } %>
-                        </strong></div>
+                        <div><strong><%= movieName %></strong></div>
                     </div>
 
                     <div class="chip">
                         <div class="note">Suất (ngày & thời gian)</div>
                         <div>
-                            <% if (bill.getTickets()!=null && !bill.getTickets().isEmpty()) {
-                                if (first != null && first.getSeatSchedule()!=null && first.getSeatSchedule().getSchedule()!=null) {
-                                        dateStr
-                                        startTimeStr
-                                        endTimeStr
-                            %>
-                                <strong><%= dateStr %></strong> — <span class="note"><%= st %> đến <%= et %></span>
-                            <%  } else { %>
-                                -
-                            <% } %>
+                            <strong><%= dateStr %></strong> — <span class="note"><%= startTimeStr %> đến <%= endTimeStr %></span>
                         </div>
                     </div>
 
                     <div class="chip">
                         <div class="note">Phòng</div>
-                        <div>
-                            <% if (bill.getTickets()!=null && !bill.getTickets().isEmpty()) {
-                                String roomName = "-";
-                                    roomName
-                                }
-                            %>
-                                <strong><%= roomName %></strong>
-                            <% } else { %>
-                                -
-                            <% } %>
-                        </div>
+                        <div><strong><%= roomName %></strong></div>
                     </div>
                 </div>
             </div>
@@ -168,7 +141,14 @@
                             if (t.getSeatSchedule()!=null && t.getSeatSchedule().getSeat()!=null) {
                                 if (t.getSeatSchedule().getSeat().getName()!=null) seatName = t.getSeatSchedule().getSeat().getName();
                                 float mul = t.getSeatSchedule().getSeat().getPriceMultiplier();
-                                if (mul >= 1.2f) seatType = "VIP"; else if (mul > 1.0f) seatType = "Premium"; else seatType = "Standard";
+                                String desc = t.getSeatSchedule().getSeat().getDescription();
+                                if (desc != null && !desc.trim().isEmpty()) {
+                                    seatType = desc.trim();
+                                } else {
+                                    if (mul >= 1.2f) seatType = "VIP";
+                                    else if (mul > 1.0f) seatType = "Premium";
+                                    else seatType = "Standard";
+                                }
                             }
                     %>
                         <tr>
@@ -182,6 +162,10 @@
                     <% } %>
                     </tbody>
                     <tfoot>
+                        <tr>
+                            <td colspan="2">Điểm quy đổi: <strong><%= String.format("%,.0f", points) %></strong> (1 đ = 1.000 VND) — Giá trị quy đổi: <strong><%= String.format("%,.0f", pointsVnd) %> VND</strong></td>
+                            <td class="right">&nbsp;</td>
+                        </tr>
                         <tr class="total-row">
                             <td colspan="2">TỔNG</td>
                             <td class="right"><%= String.format("%,.0f", bill.getTotalPrice()) %> VND</td>
@@ -189,15 +173,13 @@
                     </tfoot>
                 </table>
             </div>
-
-            <div class="section note">Điểm quy đổi: <strong><%= bill.getPointEx() %></strong></div>
+            
         </div>
 
         <div class="actions">
-            <div class="note">In để cung cấp cho khách hàng. Màn hình này hiển thị thông tin cơ bản nhất.</div>
+            <div class="note">In để cung cấp cho khách hàng.</div>
             <div>
                 <button class="btn btn-print" onclick="window.print();">In hóa đơn</button>
-                <a class="btn btn-back" href="<%=request.getContextPath()%>/ticketnBill">Quay lại</a>
             </div>
         </div>
     </div>

@@ -1,0 +1,44 @@
+/* Styles for Login.jsp (extracted from inline JSP styles) */
+:root { --font-primary: 'Inter', 'Poppins', sans-serif; }
+
+body, .login-page, .login-card, .login-body, .login-header { font-family: var(--font-primary); }
+
+/* Ensure login headings and button use the same clean typography */
+.login-header h1, .login-body .form-title, .btn.login-primary {
+    font-family: var(--font-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.login-body .form-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 12px; }
+.btn.login-primary { font-weight: 700; letter-spacing: 0.2px; font-size: 1rem; }
+
+/* Make SVG icons white (override inline stroke attributes where necessary) */
+.input-with-icon .icon-left svg path,
+.input-with-icon .icon-left svg circle,
+.input-with-icon .icon-left svg rect,
+.input-with-icon .icon-left svg line,
+.input-with-icon .icon-left svg polyline,
+.input-with-icon .icon-left svg polygon,
+.icon-right svg path,
+.icon-right svg circle,
+.icon-right svg rect,
+.icon-right svg line,
+.icon-right svg polyline,
+.icon-right svg polygon {
+    stroke: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+/* Ghi nhớ tôi label white */
+label.remember { color: #ffffff; font-weight: 500; }
+
+/* Small accessibility/touch improvements for icons */
+.icon-left, .icon-right { display:inline-flex; align-items:center; justify-content:center; }
+.icon-right { background: transparent; border: 0; padding: 4px; cursor: pointer; }
+.icon-right:focus { outline: 2px solid rgba(255,255,255,0.12); border-radius: 6px; }
+
+/* Minor spacing fix for input-with-icon */
+.input-with-icon { position: relative; display: flex; align-items: center; gap: 8px; }
+.input-with-icon input { padding-left: 8px; }
+
+/* Keep the rest of layout intact; this file is intentionally small */

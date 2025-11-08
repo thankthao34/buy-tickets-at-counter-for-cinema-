@@ -8,18 +8,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
-import model.OfflineBill;
-import model.Ticket;
-import model.TicketClerk;
-import model.Seat;
-import model.SeatSchedule;
-import model.Schedule;
-import model.Room;
-import model.Movie;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.Movie;
+import model.OfflineBill;
+import model.Room;
+import model.Schedule;
+import model.Seat;
+import model.SeatSchedule;
+import model.Ticket;
+import model.TicketClerk;
 
 /**
  *
@@ -69,7 +69,7 @@ public class OfflineBillDao extends DAO {
             if (result == null) return null; // not found
 
             // 2) Get tickets and related seat/schedule/movie/room
-            String qTickets = "SELECT t.id AS ticketId, t.price AS ticketPrice, ss.id AS ssId, s.id AS seatId, s.name AS seatName, s.priceMultiplier, "
+        String qTickets = "SELECT t.id AS ticketId, t.price AS ticketPrice, ss.id AS ssId, s.id AS seatId, s.name AS seatName, s.description AS seatDescription, s.priceMultiplier, "
                     + "sch.id AS scheduleId, sch.date AS scheduleDate, sch.startTime AS startTime, sch.endTime AS endTime, "
                     + "r.id AS roomId, r.name AS roomName, m.id AS movieId, m.name AS movieName "
                     + "FROM tblTicket t "
@@ -92,6 +92,7 @@ public class OfflineBillDao extends DAO {
                         Seat seat = new Seat();
                         seat.setId(rs2.getInt("seatId"));
                         seat.setName(rs2.getString("seatName"));
+                        seat.setDescription(rs2.getString("seatDescription"));
                         seat.setPriceMultiplier(rs2.getFloat("priceMultiplier"));
 
                         Room room = new Room();

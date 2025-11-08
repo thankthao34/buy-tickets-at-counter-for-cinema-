@@ -33,12 +33,29 @@ public class ScheduleServlet extends HttpServlet {
             return;
         }
 
-        // lấy các lịch chiếu ngày hôm nay
-        java.util.Date today = new java.util.Date();
-        java.sql.Date sqlToday = new java.sql.Date(today.getTime());
+        // Nếu có tham số date (yyyy-MM-dd) -> lấy lịch cho ngày đó, ngược lại lấy hôm nay
+        String dateParam = req.getParameter("date");
+        java.sql.Date sqlDate = null;
+        try {
+            if (dateParam != null && !dateParam.isEmpty()) {
+                // expects format yyyy-MM-dd
+                sqlDate = java.sql.Date.valueOf(dateParam);
+            }
+        } catch (Exception ex) {
+            sqlDate = null; // fall back to today
+        }
+        if (sqlDate == null) {
+            java.util.Date today = new java.util.Date();
+            sqlDate = new java.sql.Date(today.getTime());
+        }
 
         ScheduleDao sdao = new ScheduleDao();
-        List<Schedule> schedules = sdao.findByMovie(movieId, sqlToday);
+        List<Schedule> schedules = sdao.findByMovie(movieId, sqlDate);
+
+        // expose the selected date back to JSP in yyyy-MM-dd and dd/MM/yyyy formats
+        req.setAttribute("selectedDateParam", sqlDate.toString()); // yyyy-MM-dd
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        req.setAttribute("selectedDateDisplay", sdf.format(new java.util.Date(sqlDate.getTime())));
 
 
         MovieDao mdao = new MovieDao();
