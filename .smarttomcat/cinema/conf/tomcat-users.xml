@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tomcat-users xmlns="http://tomcat.apache.org/xml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd">
+    <!-- Khai báo role -->
+    <role rolename="manager-gui"/>
+    <role rolename="manager-script"/>
+    <role rolename="admin-gui"/>
+    <role rolename="admin-script"/>
+    <!-- Tạo user -->
+    <user password="123456" roles="manager-gui,manager-script,admin-gui,admin-script,admin" username="admin"/>
+</tomcat-users>
