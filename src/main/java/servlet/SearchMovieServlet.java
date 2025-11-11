@@ -31,10 +31,5 @@ public class SearchMovieServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/TicketClerk/SearchMovie.jsp").forward(req, resp);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // delegate POST to GET so form can use either method
-        doGet(req, resp);
-    }
 
 }

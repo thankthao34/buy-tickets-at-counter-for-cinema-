@@ -51,14 +51,14 @@ public class TicketnBillServlet extends HttpServlet {
             session.setAttribute("selectedSeats", selectedSeats);
         }
 
-        if ((schedule == null || schedule.getId() == 0) && scheduleIdParam != null) {
-            try {
-                int sid = Integer.parseInt(scheduleIdParam);
-                ScheduleDao sdao = new ScheduleDao();
-                schedule = sdao.getById(sid);
-                session.setAttribute("currentSchedule", schedule);
-            } catch (Exception ex) { /* ignore */ }
-        }
+//        if ((schedule == null || schedule.getId() == 0) && scheduleIdParam != null) {
+//            try {
+//                int sid = Integer.parseInt(scheduleIdParam);
+//                ScheduleDao sdao = new ScheduleDao();
+//                schedule = sdao.getById(sid);
+//                session.setAttribute("currentSchedule", schedule);
+//            } catch (Exception ex) { /* ignore */ }
+//        }
 
         // compute cartTotal if not present
         Double cartTotal = (Double) session.getAttribute("cartTotal");
@@ -91,35 +91,6 @@ public class TicketnBillServlet extends HttpServlet {
         Schedule schedule = (Schedule) session.getAttribute("currentSchedule");
         User user = (User) session.getAttribute("user");
 
-        if (selectedSeats == null || selectedSeats.isEmpty() || schedule == null || user == null) {
-            // missing data -> back to seat map
-            session.removeAttribute("selectedSeats");
-            // session.removeAttribute("selectedSeatIds");
-            session.setAttribute("cartTotal", 0.0);
-            resp.sendRedirect(req.getContextPath() + "/searchMovie");
-            return;
-        }
-
-        // selectedSeats must be present in session (set by doGet). If missing, treat as invalid and redirect.
-        if (selectedSeats == null || selectedSeats.isEmpty()) {
-            session.removeAttribute("selectedSeats");
-            session.setAttribute("cartTotal", 0.0);
-            resp.sendRedirect(req.getContextPath() + "/searchMovie");
-            return;
-        }
-
-        // build ticket list
-        List<Ticket> tickets = new ArrayList<>();
-        for (SeatSchedule ss : selectedSeats) {
-            Ticket t = new Ticket();
-            double multiplier = 1.0;
-            if (ss.getSeat() != null) multiplier = ss.getSeat().getPriceMultiplier();
-            float price = (float) (schedule.getBasePrice() * multiplier);
-            t.setPrice(price);
-            t.setSeatSchedule(ss);
-            tickets.add(t);
-        }
-
     // 1) Check availability of selected seats before attempting to save
     SeatScheduleDao ssDaoCheck = new SeatScheduleDao();
     // boolean allAvailable = ssDaoCheck.checkSeatSchedule(selectedIds);
@@ -131,11 +102,21 @@ public class TicketnBillServlet extends HttpServlet {
             session.removeAttribute("selectedSeats");
             // session.removeAttribute("selectedSeatIds");
             session.setAttribute("cartTotal", 0.0);
-            session.setAttribute("bookingError", "Một hoặc nhiều ghế của bạn đã bị đặt. Vui lòng chọn lại.");
+            session.setAttribute("bookingError", "Một hoặc nhiều ghế bạn chọn đã bị đặt. Vui lòng chọn lại.");
             resp.sendRedirect(req.getContextPath() + "/seatmap?scheduleId=" + schedule.getId());
             return;
         }
-
+        // build ticket list
+        List<Ticket> tickets = new ArrayList<>();
+        for (SeatSchedule ss : selectedSeats) {
+            Ticket t = new Ticket();
+            double multiplier = 1.0;
+            if (ss.getSeat() != null) multiplier = ss.getSeat().getPriceMultiplier();
+            float price = (float) (schedule.getBasePrice() * multiplier);
+            t.setPrice(price);
+            t.setSeatSchedule(ss);
+            tickets.add(t);
+        }
         // 2) All seats available -> prepare OfflineBill and save using OfflineBillDao.saveOfflineBill(OfflineBill)
         OfflineBill offline = new OfflineBill();
         TicketClerk clerk = new TicketClerk();

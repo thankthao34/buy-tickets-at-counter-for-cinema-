@@ -22,16 +22,7 @@ body{
 @media(max-width:768px){.card-title{font-size:1.4rem}}
 .card{background:rgba(255,255,255,0.97);border-radius:12px;padding:16px;box-shadow:0 12px 30px rgba(2,6,23,0.06)}
 
-/* Login-specific styles */
-.login-form{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-.login-form label{font-size:14px;color:#333;font-weight:600}
-.login-form input[type=text],.login-form input[type=password]{border-radius:8px;border:1px solid rgba(0,0,0,0.08);font-size:14px}
-.login-form input:focus{outline:none;box-shadow:0 8px 20px rgba(0,0,128,0.12);border-color:var(--primary)}
-.login-error .alert{margin:0}
-.login-card-centered{display:flex;align-items:center;justify-content:center;min-height:60vh}
-
-/* ensure hero header color sync with login title */
-.page-hero h1, .card h2{color:#ffd966}
+/* Login-specific styles moved to assets/css/login.css */
 
 /* header */
 .seller-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
@@ -128,27 +119,4 @@ body{
 .modal-confirm { display:inline-block; padding:10px 22px; border-radius:6px; background:linear-gradient(90deg,var(--primary),var(--primary-dark)); color:#fff; font-weight:700; text-decoration:none; }
 @media (max-width:640px){ .modal-row{flex-direction:column} }
 
-/* Login page specific styles (scoped to avoid changing other pages) */
-.login-page{background:transparent;}
-.login-card{width:100%;max-width:520px;background:rgba(0,0,0,0.45);border-radius:14px;padding:28px 28px;color:#fff;border:1px solid rgba(255,255,255,0.06);box-shadow:0 30px 60px rgba(2,6,23,0.45);}
-.login-header{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:8px}
-.login-header h1{margin:0;font-size:20px;font-weight:800;color:#fff;letter-spacing:0.2px}
-.login-body{padding-top:6px}
-.form-title{margin:8px 0 12px 0;text-align:center;font-size:18px;color:rgba(255,255,255,0.95)}
-.input-with-icon{position:relative;margin-bottom:8px}
-.input-with-icon .icon-left{position:absolute;left:10px;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;justify-content:center}
-.input-with-icon input{width:90%;padding:12px 40px 12px 40px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:#fff;font-size:15px}
-.input-with-icon input::placeholder{color:rgba(255,255,255,0.72)}
-.input-with-icon .icon-right{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:0;padding:6px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
-.input-with-icon .icon-right svg{opacity:0.95}
-.remember{font-size:13px;color:rgba(255,255,255,0.9);display:inline-flex;align-items:center;gap:8px}
-.remember input{width:16px;height:16px}
-.btn.login-primary{background:#000080;color:#fff;padding:12px 24px;border-radius:8px;border:0;font-weight:800;font-size:16px;box-shadow:0 8px 22px rgba(0,0,0,0.3);cursor:pointer}
-.btn.login-primary:hover{filter:brightness(1.04)}
-.login-links .link-register{color:#cfe3ff;font-weight:700;text-decoration:underline}
-.login-error .alert{margin-top:8px}
-
-@media (max-width:520px){
-  .login-card{padding:18px}
-  .btn.login-primary{width:100%}
-}
+/* Login page specific styles moved to assets/css/login.css */

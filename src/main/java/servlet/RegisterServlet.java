@@ -106,12 +106,13 @@ public class RegisterServlet extends HttpServlet {
 
         // 11) doPost() gọi CustomerDao
         CustomerDao dao = new CustomerDao();
-        boolean saved = dao.saveCustomer(customer);
+        String memberCode = dao.saveCustomer(customer);
 
-        if (saved) {
-            // 14) RegisterServlet trả về cho Register.jsp
-            req.setAttribute("success", "Đăng ký thành công. Bạn sẽ được chuyển đến trang đăng nhập...");
-            // For user experience, forward to Register.jsp where page will redirect to login
+        if (memberCode != null) {
+            // Return to Register.jsp with memberCode so the page can display a popup
+            req.setAttribute("success", "Đăng ký thành công.");
+            req.setAttribute("memberCode", memberCode);
+            // Forward to JSP which will show popup and redirect to home
             req.getRequestDispatcher("/Register.jsp").forward(req, resp);
         } else {
             req.setAttribute("error", "Đăng ký thất bại, vui lòng thử lại (username/email có thể đã tồn tại).\n");

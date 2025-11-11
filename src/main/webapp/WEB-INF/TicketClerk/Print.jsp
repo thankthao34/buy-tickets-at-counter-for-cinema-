@@ -142,13 +142,7 @@
                                 if (t.getSeatSchedule().getSeat().getName()!=null) seatName = t.getSeatSchedule().getSeat().getName();
                                 float mul = t.getSeatSchedule().getSeat().getPriceMultiplier();
                                 String desc = t.getSeatSchedule().getSeat().getDescription();
-                                if (desc != null && !desc.trim().isEmpty()) {
-                                    seatType = desc.trim();
-                                } else {
-                                    if (mul >= 1.2f) seatType = "VIP";
-                                    else if (mul > 1.0f) seatType = "Premium";
-                                    else seatType = "Standard";
-                                }
+                                seatType = desc.trim();
                             }
                     %>
                         <tr>
